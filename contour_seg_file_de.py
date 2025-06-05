@@ -94,12 +94,7 @@ def objective_function(num, img_array, w_irregularity, w_bound, w_volume, w_comp
         SI = pow(perimeter, 2) / (max_area * 4 * np.pi)
 
     # Calculate boundary point proportion as a penalty term
-    p = 5
     boundary_penalty = calculate_boundary_proportion(polygons[0], w, h, threshold=1)
-    if boundary_penalty <= 0.2:
-        boundary_penalty = 0
-    else:
-        boundary_penalty = p * boundary_penalty
 
     # Calculate the average height at the polygon's boundary (h_rim)
     mask = np.zeros_like(img_array, dtype=np.uint8)
@@ -135,9 +130,15 @@ def objective_function(num, img_array, w_irregularity, w_bound, w_volume, w_comp
 def get_crater_contours(img_array, w_irregularity, w_bound, w_volume, w_compactness, edge_margin):
     h, w = img_array.shape
     # Perform optimization to find the optimal value of `num`
-    result = differential_evolution(objective_function, bounds=[(2, 7)],
-                                    args=(img_array, w_irregularity, w_bound, w_volume, w_compactness, edge_margin, w, h),
-                                    strategy='best1bin', maxiter=15, popsize=3, recombination=0.5)
+    result = gp_minimize(
+        objective_wrapper,
+        dimensions=bounds,
+        acq_func='EI',
+        n_calls=15,
+        n_initial_points=5,
+        random_state=42,
+        x0=[4.0]
+    )
     optimal_h = result.x[0]  # Optimal value for `h`
     print(f"Optimal_h: {optimal_h}")
     # Enhance the DEM array using the optimal `h`

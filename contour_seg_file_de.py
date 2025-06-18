@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from scipy.optimize import differential_evolution
+from skopt import gp_minimize
 
 def enhance_dem_array(array, n):
     # Ensure input is 2D

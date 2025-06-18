@@ -131,7 +131,7 @@ def get_crater_contours(img_array, w_irregularity, w_bound, w_volume, w_compactn
     h, w = img_array.shape
     # Perform optimization to find the optimal value of `num`
     result = gp_minimize(
-        objective_wrapper,
+        objective_function,
         dimensions=bounds,
         acq_func='EI',
         n_calls=15,
